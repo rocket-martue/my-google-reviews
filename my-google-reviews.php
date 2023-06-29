@@ -86,16 +86,15 @@ function display_reviews_from_data( $reviews ) {
 		<?php echo $place_name; ?> Google口コミレビュー
 	</h2>
 	<p class="vicinity"><?php echo $address; ?></p>
-	<p class="rating"><span class="number"><?php echo esc_html( $rating ); ?></span> <span class="rating-star""><?php echo get_rating_stars( $rating ); ?></span> <a href="https://search.google.com/local/reviews?placeid=<?php echo $place_id; ?>" target="_blank" rel="nofollow" class="count"><?php echo $review_count; ?> reviews</a></p>
+	<p class="rating"><span class="number"><?php echo esc_html( $rating ); ?></span> <span class="rating-star"><?php echo get_rating_stars( $rating ); ?></span> <a href="https://search.google.com/local/reviews?placeid=<?php echo $place_id; ?>" target="_blank" rel="nofollow" class="count"><?php echo $review_count; ?> reviews</a></p>
 	<?php
 
 	// Check if reviews are available
-	if ( isset( $reviews_data->result->reviews ) && ! empty( $reviews_data->result->reviews ) ) {
-		$reviews = $reviews_data->result->reviews;
+	if ( isset( $reviews ) && ! empty( $reviews ) ) {
 
 		// Display reviews
 		?>
-		<ul class="listing"> <!-- Modified: Opening ul tag -->
+		<ul class="listing">
 			<?php foreach ( $reviews as $index => $review ) : ?>
 				<?php
 				$rating                 = $review->rating;
@@ -106,7 +105,7 @@ function display_reviews_from_data( $reviews ) {
 				$author_avatar          = isset( $review->profile_photo_url ) ? esc_url( $review->profile_photo_url ) : '';
 				$relative_time_description = isset( $review->relative_time_description ) ? esc_html( $review->relative_time_description ) : '';
 				?>
-				<li class="rating-<?php echo $rating; ?>" data-index="<?php echo $index; ?>"> <!-- Modified: Opening li tag -->
+				<li class="rating-<?php echo $rating; ?>" data-index="<?php echo $index; ?>">
 					<span class="author-avatar"><a href="<?php echo $author_url; ?>" target="_blank" rel="nofollow"><img src="<?php echo $author_avatar; ?>" alt="Avatar"></a></span>
 					<span class="review-meta">
 						<span class="author-name"><a href="<?php echo $author_url; ?>" target="_blank" rel="nofollow"><?php echo $author; ?></a></span>
@@ -122,16 +121,19 @@ function display_reviews_from_data( $reviews ) {
 					<div class="text">
 						<?php echo esc_html( $comment ); ?>
 					</div>
-				</li> <!-- Modified: Closing li tag -->
+				</li>
 			<?php endforeach; ?>
-		</ul> <!-- Modified: Closing ul tag -->
+		</ul>
 		<?php
 	} else {
 		echo 'No reviews found.';
 	}
 
+	// Get buffered content and clean the buffer
+	$output = ob_get_clean();
+
 	// Output the content
-		?>
+	?>
 	<div id="google-business-reviews-rating" class="google-business-reviews-rating gmbrr contrast stars-css">
 		<?php
 		echo $output;
@@ -140,7 +142,7 @@ function display_reviews_from_data( $reviews ) {
 	<div class="review-link">
 		<a href="https://search.google.com/local/reviews?placeid=<?php echo $place_id; ?>" class="button" target="_blank" rel="nofollow">もっとみる ＞＞</a>
 	</div>
-		<?php
+	<?php
 }
 
 // Function to generate rating stars based on rating value
@@ -197,3 +199,10 @@ function display_google_reviews_place_e() {
 	display_google_reviews( $place_id );
 }
 add_action( 'display_google_reviews_place_e', 'display_google_reviews_place_e' );
+
+// Display Google reviews for Place F
+function display_google_reviews_place_f() {
+	$place_id = 'PLACE_F_ID';
+	display_google_reviews( $place_id );
+}
+add_action( 'display_google_reviews_place_f', 'display_google_reviews_place_f' );
