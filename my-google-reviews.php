@@ -15,6 +15,16 @@ function display_google_reviews( $place_id ) {
 	$api_key   = 'Your_API_Key';
 	$language  = 'ja'; // 言語を日本語に設定
 
+	// Check if the reviews data is available in cache
+	$cache_key = 'google_reviews_' . $place_id;
+	$reviews_data = get_transient( $cache_key );
+
+	if ( $reviews_data !== false ) {
+		// Display reviews from cache
+		display_reviews_from_data( $reviews_data );
+		return;
+	}
+
 	// Make API request to fetch place details
 	$place_details_url      = "https://maps.googleapis.com/maps/api/place/details/json?placeid={$place_id}&fields=name,rating,user_ratings_total,formatted_address&language={$language}&key={$api_key}";
 	$place_details_response = wp_remote_get( $place_details_url );
@@ -35,10 +45,39 @@ function display_google_reviews( $place_id ) {
 	$address        = isset( $place_details_data->result->formatted_address ) ? esc_html( $place_details_data->result->formatted_address ) : '';
 	$logo_icon      = isset( $place_details_data->result->icon ) ? esc_url( $place_details_data->result->icon ) : '';
 
+	// Make API request to fetch reviews
+	$reviews_url      = "https://maps.googleapis.com/maps/api/place/details/json?placeid={$place_id}&fields=rating,reviews&language={$language}&key={$api_key}";
+	$reviews_response = wp_remote_get( $reviews_url );
+
+	// Check if reviews API request was successful
+	if ( is_wp_error( $reviews_response ) || wp_remote_retrieve_response_code( $reviews_response ) !== 200 ) {
+		echo 'Error retrieving reviews.';
+		error_log( 'Google Reviews API Error: ' . wp_remote_retrieve_response_message( $reviews_response ) );
+		return;
+	}
+
+	$reviews_data = json_decode( wp_remote_retrieve_body( $reviews_response ) );
+
+	// Check if reviews are available
+	if ( isset( $reviews_data->result->reviews ) && ! empty( $reviews_data->result->reviews ) ) {
+		$reviews = $reviews_data->result->reviews;
+
+		// Save the reviews data to cache for 24 hours
+		set_transient( $cache_key, $reviews, 24 * HOUR_IN_SECONDS );
+
+		// Display reviews
+		display_reviews_from_data( $reviews );
+	} else {
+		echo 'No reviews found.';
+	}
+}
+
+// Function to display reviews from data
+function display_reviews_from_data( $reviews ) {
 	// Start output buffering
 	ob_start();
 
-	// Display place details
+	// Display place details and reviews
 	?>
 	<h2 class="heading">
 		<?php if ( $logo_icon ) : ?>
@@ -104,20 +143,17 @@ function display_google_reviews( $place_id ) {
 		echo 'No reviews found.';
 	}
 
-	// Get buffered content and clean the buffer
-	$output = ob_get_clean();
-
 	// Output the content
-	?>
-<div id="google-business-reviews-rating" class="google-business-reviews-rating gmbrr contrast stars-css">
-	<?php
-	echo $output;
-	?>
+		?>
+	<div id="google-business-reviews-rating" class="google-business-reviews-rating gmbrr contrast stars-css">
+		<?php
+		echo $output;
+		?>
+	</div>
 	<div class="review-link">
 		<a href="https://search.google.com/local/reviews?placeid=<?php echo $place_id; ?>" class="button" target="_blank" rel="nofollow">もっとみる ＞＞</a>
 	</div>
-</div>
-	<?php
+		<?php
 }
 
 // Function to generate rating stars based on rating value
