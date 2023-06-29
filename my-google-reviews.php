@@ -15,7 +15,7 @@ function display_google_reviews( $place_id ) {
 	$api_key   = 'Your_API_Key';
 	$language  = 'ja'; // 言語を日本語に設定
 
-	// Check if the reviews data is available in cache
+	// Check if the reviews are available in cache
 	$cache_key = 'google_reviews_' . $place_id;
 	$reviews_data = get_transient( $cache_key );
 
@@ -88,19 +88,6 @@ function display_reviews_from_data( $reviews ) {
 	<p class="vicinity"><?php echo $address; ?></p>
 	<p class="rating"><span class="number"><?php echo esc_html( $rating ); ?></span> <span class="rating-star""><?php echo get_rating_stars( $rating ); ?></span> <a href="https://search.google.com/local/reviews?placeid=<?php echo $place_id; ?>" target="_blank" rel="nofollow" class="count"><?php echo $review_count; ?> reviews</a></p>
 	<?php
-
-	// Make API request to fetch reviews
-	$reviews_url      = "https://maps.googleapis.com/maps/api/place/details/json?placeid={$place_id}&fields=rating,reviews&language={$language}&key={$api_key}";
-	$reviews_response = wp_remote_get( $reviews_url );
-
-	// Check if reviews API request was successful
-	if ( is_wp_error( $reviews_response ) || wp_remote_retrieve_response_code( $reviews_response ) !== 200 ) {
-		echo 'Error retrieving reviews.';
-		error_log( 'Google Reviews API Error: ' . wp_remote_retrieve_response_message( $reviews_response ) );
-		return;
-	}
-
-	$reviews_data = json_decode( wp_remote_retrieve_body( $reviews_response ) );
 
 	// Check if reviews are available
 	if ( isset( $reviews_data->result->reviews ) && ! empty( $reviews_data->result->reviews ) ) {
