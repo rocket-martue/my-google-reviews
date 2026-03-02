@@ -1,9 +1,13 @@
 <?php
 /**
- * setting
- * @package my google reviews
+ * Settings
+ *
+ * @package MyGoogleReviews
  */
 
+/**
+ * Initialize plugin settings.
+ */
 function google_reviews_settings_init() {
 	add_settings_section(
 		'google_reviews_section',
@@ -20,13 +24,25 @@ function google_reviews_settings_init() {
 		'google_reviews_section'
 	);
 
-	register_setting( 'general', 'google_reviews_api_key' );
+	register_setting(
+		'general',
+		'google_reviews_api_key',
+		array(
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
 }
 
+/**
+ * Callback for Google Reviews settings section.
+ */
 function google_reviews_section_callback() {
-	echo '<p>Enter your Google Places API Key below:</p>';
+	echo '<p>' . esc_html__( 'Enter your Google Places API Key below:', 'my-google-reviews' ) . '</p>';
 }
 
+/**
+ * Callback for Google Reviews API Key field.
+ */
 function google_reviews_api_key_callback() {
 	$api_key = get_option( 'google_reviews_api_key' );
 
