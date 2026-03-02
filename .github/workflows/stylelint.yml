@@ -1,0 +1,72 @@
+# CSS/SCSS Lint チェック＆自動修正
+# StylelintでCSSのコード品質をチェックし、PRでは自動修正してコミットする
+
+name: Stylelint
+
+on:
+  pull_request:
+    paths:
+      - '**/*.css'
+      - '**/*.scss'
+      - '.stylelintrc*'
+      - 'package.json'
+  push:
+    branches:
+      - main
+      - master
+      - develop
+    paths:
+      - '**/*.css'
+      - '**/*.scss'
+      - '.stylelintrc*'
+      - 'package.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  stylelint:
+    name: Stylelint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check if package.json exists
+        id: check-package
+        run: |
+          if [ -f "package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        if: steps.check-package.outputs.exists == 'true'
+        run: npm ci
+
+      - name: Run Stylelint with auto-fix
+        if: steps.check-package.outputs.exists == 'true'
+        run: npm run fix:css --if-present
+        continue-on-error: true
+
+      - name: Commit fixes
+        if: steps.check-package.outputs.exists == 'true' && github.event_name == 'pull_request'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'style: Stylelintによる自動修正'
+
+      - name: Run Stylelint check
+        if: steps.check-package.outputs.exists == 'true'
+        run: npm run lint:css --if-present

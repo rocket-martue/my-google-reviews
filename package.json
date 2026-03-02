@@ -1,0 +1,16 @@
+{
+	"name": "my-google-reviews",
+	"version": "1.0.0",
+	"description": "Plugin for displaying Google reviews.",
+	"private": true,
+	"scripts": {
+		"lint:css": "stylelint \"**/*.{css,scss}\"",
+		"lint": "npm run lint:css",
+		"fix:css": "stylelint \"**/*.{css,scss}\" --fix",
+		"fix": "npm run fix:css"
+	},
+	"devDependencies": {
+		"@wordpress/stylelint-config": "^23.0.0",
+		"stylelint": "^16.0.0"
+	}
+}

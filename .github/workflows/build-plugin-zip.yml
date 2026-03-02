@@ -1,0 +1,67 @@
+# プラグインZIPファイルビルド
+# リリース時に配布用ZIPファイルを作成する
+
+name: Build Plugin Zip
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (例: 1.0.0)'
+        required: false
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build Plugin Zip
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          elif [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create plugin directory
+        run: |
+          mkdir -p build/my-google-reviews
+          rsync -av \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.vscode/' \
+            --exclude='.gitkeep' \
+            --exclude='build/' \
+            --exclude='node_modules/' \
+            --exclude='vendor/' \
+            ./ build/my-google-reviews/
+
+      - name: Create ZIP file
+        run: |
+          cd build
+          zip -r my-google-reviews-${{ steps.get_version.outputs.version }}.zip my-google-reviews
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-google-reviews-${{ steps.get_version.outputs.version }}
+          path: build/my-google-reviews-${{ steps.get_version.outputs.version }}.zip
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/my-google-reviews-${{ steps.get_version.outputs.version }}.zip
