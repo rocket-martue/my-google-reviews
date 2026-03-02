@@ -7,6 +7,8 @@
  * Author:      Rocket Martue
  * Author URI:  https://github.com/rocket-martue
  * License:     GPL2
+ *
+ * @package MyGoogleReviews
  */
 
 defined( 'ABSPATH' ) || exit;

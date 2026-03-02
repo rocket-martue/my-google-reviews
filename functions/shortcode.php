@@ -1,16 +1,25 @@
 <?php
 /**
- * shortcode
- * @package my google reviews
+ * Shortcode
+ *
+ * @package MyGoogleReviews
+ */
+
+/**
+ * Shortcode to display Google Reviews.
+ *
+ * @param array $atts Shortcode attributes.
+ * @return string HTML output of the reviews.
  */
 function google_reviews_shortcode( $atts ) {
-	
+
 	$atts = shortcode_atts(
 		array(
 			'place_id' => '',
-			'language' => 'ja' // デフォルトの言語は英語
+			'language' => 'ja', // デフォルトの言語は英語なので、日本語に変更
 		),
-		$atts
+		$atts,
+		'google_reviews'
 	);
 
 	$place_id = $atts['place_id'];
