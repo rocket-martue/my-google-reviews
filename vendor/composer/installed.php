@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'rocket-martue/my-google-reviews',
-        'pretty_version' => 'dev-717f17ed787fa4d2ab3030bd32cf9d8b12e077f0',
-        'version' => 'dev-717f17ed787fa4d2ab3030bd32cf9d8b12e077f0',
-        'reference' => '717f17ed787fa4d2ab3030bd32cf9d8b12e077f0',
+        'pretty_version' => 'dev-31be2885d3ea8da75696a70224ea002214c9fa91',
+        'version' => 'dev-31be2885d3ea8da75696a70224ea002214c9fa91',
+        'reference' => '31be2885d3ea8da75696a70224ea002214c9fa91',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -65,9 +65,9 @@
             'dev_requirement' => true,
         ),
         'rocket-martue/my-google-reviews' => array(
-            'pretty_version' => 'dev-717f17ed787fa4d2ab3030bd32cf9d8b12e077f0',
-            'version' => 'dev-717f17ed787fa4d2ab3030bd32cf9d8b12e077f0',
-            'reference' => '717f17ed787fa4d2ab3030bd32cf9d8b12e077f0',
+            'pretty_version' => 'dev-31be2885d3ea8da75696a70224ea002214c9fa91',
+            'version' => 'dev-31be2885d3ea8da75696a70224ea002214c9fa91',
+            'reference' => '31be2885d3ea8da75696a70224ea002214c9fa91',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
